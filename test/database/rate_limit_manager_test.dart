@@ -5,8 +5,7 @@ void main() {
   group('RateLimitManager', () {
     late RateLimitManager rateLimiter;
 
-    setUp(() {
-    });
+    setUp(() {});
 
     tearDown(() {
       rateLimiter.dispose();
@@ -42,10 +41,7 @@ void main() {
       });
 
       test('throttles requests exceeding rate limit', () async {
-        rateLimiter = RateLimitManager(
-          maxRequests: 2,
-          rateLimitWindow: const Duration(milliseconds: 500),
-        );
+        rateLimiter = RateLimitManager(maxRequests: 2, rateLimitWindow: const Duration(milliseconds: 500));
 
         // Make 2 requests to reach the limit
         await rateLimiter.checkRateLimit(FirestorePath('/test/path1'), 'test_action', batched: true);
@@ -61,10 +57,7 @@ void main() {
       });
 
       test('releases throttled requests after window expires', () async {
-        rateLimiter = RateLimitManager(
-          maxRequests: 1,
-          rateLimitWindow: const Duration(milliseconds: 200),
-        );
+        rateLimiter = RateLimitManager(maxRequests: 1, rateLimitWindow: const Duration(milliseconds: 200));
 
         // First request
         await rateLimiter.checkRateLimit(FirestorePath('/test/path1'), 'test_action', batched: true);
@@ -80,10 +73,7 @@ void main() {
       });
 
       test('handles multiple concurrent throttled requests', () async {
-        rateLimiter = RateLimitManager(
-          maxRequests: 1,
-          rateLimitWindow: const Duration(milliseconds: 300),
-        );
+        rateLimiter = RateLimitManager(maxRequests: 1, rateLimitWindow: const Duration(milliseconds: 300));
 
         // First request to reach the limit
         await rateLimiter.checkRateLimit(FirestorePath('/test/path1'), 'test_action', batched: true);
@@ -241,10 +231,7 @@ void main() {
 
     group('dispose', () {
       test('cancels pending timers and completes pending requests', () async {
-        rateLimiter = RateLimitManager(
-          maxRequests: 1,
-          rateLimitWindow: const Duration(seconds: 10),
-        );
+        rateLimiter = RateLimitManager(maxRequests: 1, rateLimitWindow: const Duration(seconds: 10));
 
         // First request to reach the limit
         await rateLimiter.checkRateLimit(FirestorePath('/test/path1'), 'test_action', batched: true);
@@ -276,10 +263,7 @@ void main() {
 
     group('edge cases', () {
       test('handles very short rate limit window', () async {
-        rateLimiter = RateLimitManager(
-          maxRequests: 1,
-          rateLimitWindow: const Duration(milliseconds: 1),
-        );
+        rateLimiter = RateLimitManager(maxRequests: 1, rateLimitWindow: const Duration(milliseconds: 1));
 
         // First request
         await rateLimiter.checkRateLimit(FirestorePath('/test/path1'), 'test_action', batched: true);
@@ -309,10 +293,7 @@ void main() {
       });
 
       test('maintains request order in queue', () async {
-        rateLimiter = RateLimitManager(
-          maxRequests: 1,
-          rateLimitWindow: const Duration(milliseconds: 100),
-        );
+        rateLimiter = RateLimitManager(maxRequests: 1, rateLimitWindow: const Duration(milliseconds: 100));
 
         // First request to reach the limit
         await rateLimiter.checkRateLimit(FirestorePath('/test/path1'), 'test_action', batched: true);
@@ -340,10 +321,7 @@ void main() {
 
     group('integration scenarios', () {
       test('simulates realistic database operation pattern', () async {
-        rateLimiter = RateLimitManager(
-          maxRequests: 3,
-          rateLimitWindow: const Duration(milliseconds: 200),
-        );
+        rateLimiter = RateLimitManager(maxRequests: 3, rateLimitWindow: const Duration(milliseconds: 200));
 
         final operations = <String>[];
 
@@ -365,10 +343,7 @@ void main() {
       });
 
       test('handles mixed operations with removeCount', () async {
-        rateLimiter = RateLimitManager(
-          maxRequests: 2,
-          rateLimitWindow: const Duration(milliseconds: 300),
-        );
+        rateLimiter = RateLimitManager(maxRequests: 2, rateLimitWindow: const Duration(milliseconds: 300));
 
         // Fill up the rate limit
         await rateLimiter.checkRateLimit(FirestorePath('/test/path1'), 'write', batched: true);
