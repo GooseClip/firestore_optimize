@@ -8,15 +8,11 @@ import 'operations_manager.dart';
 import 'rate_limit_manager.dart';
 
 class CollectionChanges<T> {
-  CollectionChanges({
-    this.added = const [],
-    this.modified = const [],
-    this.removed = const [],
-  });
+  CollectionChanges({this.added = const [], this.modified = const [], this.removed = const []});
 
   final List<T> added;
   final List<T> modified;
-  final List<T> removed; // WARNING: Local DBs will only return the ID of the removed object
+  final List<T> removed;
 
   bool get isEmpty => added.isEmpty && modified.isEmpty && removed.isEmpty;
 
@@ -34,22 +30,29 @@ String documentIdFromCurrentDate() {
   return iso.replaceAll(":", "-").replaceAll(".", "-");
 }
 
-typedef QueryBuilder = Query<Map<String, dynamic>>? Function(Query<Map<String, dynamic>> query)?;
+typedef QueryBuilder = Query<Map<String, dynamic>> Function(Query<Map<String, dynamic>> query);
 
 class FirestoreDataSource {
-  FirestoreDataSource._(this.instance, this.rateLimiter, this.batcher);
+  FirestoreDataSource(this.instance, this.rateLimiter, this.batcher);
+
+  factory FirestoreDataSource.defaultInstance() {
+    final instance = FirebaseFirestore.instance;
+    final batcher = OperationsManager(instance);
+    final rateLimiter = RateLimitManager();
+    return FirestoreDataSource(instance, rateLimiter, batcher);
+  }
 
   final FirebaseFirestore instance;
   final RateLimitManager rateLimiter;
   final OperationsManager batcher;
 
-  Future<DocumentReference> insert({
+  Future<DocumentReference> add({
     required CollectionPath path,
     required Map<String, dynamic> data,
     bool rateLimit = true,
   }) async {
-    if (data.values.any((e) => e is FieldValue)) {
-      throw Exception("[${path.split("/").last}] Cannot use FieldValue in insert");
+    if (_containsFieldValue(data)) {
+      throw Exception("[${path.split("/").last}] Use JitFieldValue instead of FieldValue");
     }
 
     if (rateLimit) {
@@ -58,14 +61,14 @@ class FirestoreDataSource {
     return instance.collection(path).add(data);
   }
 
-  Future<void> setData({
+  Future<void> set({
     required DocumentPath path,
     required Map<String, dynamic> data,
     bool batch = false,
     bool merge = false,
     bool rateLimit = true,
   }) async {
-    if (data.values.any((e) => e is FieldValue)) {
+    if (_containsFieldValue(data)) {
       throw Exception("[${path.split("/").last}] Use JitFieldValue instead of FieldValue");
     }
 
@@ -93,13 +96,13 @@ class FirestoreDataSource {
     await batcher.set(path: path, data: data, merge: merge);
   }
 
-  Future<void> updateData({
+  Future<void> update({
     required DocumentPath path,
     required Map<String, dynamic> data,
     bool batch = false,
     bool rateLimit = true,
   }) async {
-    if (data.values.any((e) => e is FieldValue)) {
+    if (_containsFieldValue(data)) {
       throw Exception("[${path.split("/").last}] Use JitFieldValue instead of FieldValue");
     }
 
@@ -123,11 +126,7 @@ class FirestoreDataSource {
     await batcher.update(path: path, data: data);
   }
 
-  Future<void> deleteData({
-    required DocumentPath path,
-    bool batch = false,
-    bool rateLimit = true,
-  }) async {
+  Future<void> delete({required DocumentPath path, bool batch = false, bool rateLimit = true}) async {
     // If we have a pending operation for this path, we don't need to rate limit as it only counts as 1
     final hasPending = batch && await batcher.hasPendingOperations(path);
     final canRateLimit = rateLimit && !hasPending && RateLimitManager.enabled;
@@ -150,25 +149,30 @@ class FirestoreDataSource {
   Future<void> transaction({
     required Iterable<Future<dynamic> Function(Transaction)> operations,
     Duration timeout = const Duration(seconds: 3),
+    int maxAttempts = 5,
   }) async {
-    await instance.runTransaction((transaction) async {
-      for (var operation in operations) {
-        await operation(transaction);
-      }
-    }, timeout: timeout, maxAttempts: 1);
+    await instance.runTransaction(
+      (transaction) async {
+        for (var operation in operations) {
+          await operation(transaction);
+        }
+      },
+      timeout: timeout,
+      maxAttempts: maxAttempts,
+    );
   }
 
   // watch collections and documents as streams
   Stream<List<T>> watchCollection<T>({
     required CollectionPath path,
     required T? Function(Map<String, dynamic>? data, String documentID) builder,
-    QueryBuilder queryBuilder,
+    QueryBuilder? queryBuilder,
     int Function(T lhs, T rhs)? sort,
     ListenSource source = ListenSource.defaultSource,
   }) {
     Query<Map<String, dynamic>> query = instance.collection(path);
     if (queryBuilder != null) {
-      query = queryBuilder(query)!;
+      query = queryBuilder(query);
     }
     final snapshots = query.snapshots(source: source);
     return snapshots.map((snapshot) {
@@ -193,13 +197,13 @@ class FirestoreDataSource {
   Stream<CollectionChanges<T>> watchCollectionChanges<T>({
     required CollectionPath path,
     required T? Function(Map<String, dynamic>? data, String documentID) builder,
-    QueryBuilder queryBuilder,
+    QueryBuilder? queryBuilder,
     int Function(T lhs, T rhs)? sort,
     ListenSource source = ListenSource.defaultSource,
   }) {
     Query<Map<String, dynamic>> query = instance.collection(path);
     if (queryBuilder != null) {
-      query = queryBuilder(query)!;
+      query = queryBuilder(query);
     }
 
     final snapshots = query.snapshots(source: source);
@@ -254,13 +258,13 @@ class FirestoreDataSource {
   Future<List<T>> fetchCollection<T>({
     required CollectionPath path,
     required T? Function(Map<String, dynamic>? data, String documentID) builder,
-    Query<Map<String, dynamic>>? Function(Query<Map<String, dynamic>> query)? queryBuilder,
+    QueryBuilder? queryBuilder,
     int Function(T lhs, T rhs)? sort,
     Source source = Source.serverAndCache,
   }) async {
     Query<Map<String, dynamic>> query = instance.collection(path);
     if (queryBuilder != null) {
-      query = queryBuilder(query)!;
+      query = queryBuilder(query);
     }
 
     final snapshot = await query.get(GetOptions(source: source));
@@ -297,17 +301,35 @@ class FirestoreDataSource {
     return builder(data, snapshot.id);
   }
 
-  Future<bool> documentExists({
-    required DocumentPath path,
-  }) async {
+  Future<bool> documentExists({required DocumentPath path}) async {
     final reference = instance.doc(path);
     final snapshot = await reference.get();
     return snapshot.exists;
   }
 
-  Future<int> countCollection(CollectionPath path) => fetchCollection<int>(
-      path: path,
-      builder: (_, id) {
-        return 1;
-      }).then((list) => list.length);
+  Future<int> countCollection(CollectionPath path) async {
+    final snapshot = await instance.collection(path).count().get();
+    return snapshot.count ?? 0;
+  }
+}
+
+bool _containsFieldValue(dynamic data) {
+  if (data is FieldValue) {
+    return true;
+  }
+  if (data is Map<String, dynamic>) {
+    for (var value in data.values) {
+      if (_containsFieldValue(value)) {
+        return true;
+      }
+    }
+  }
+  if (data is List) {
+    for (var item in data) {
+      if (_containsFieldValue(item)) {
+        return true;
+      }
+    }
+  }
+  return false;
 }
