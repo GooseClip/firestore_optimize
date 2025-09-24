@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 
 import 'dot_util.dart';
 import 'operations.dart';
@@ -38,7 +39,7 @@ class FirestoreDataSource {
 
   factory FirestoreDataSource.defaultInstance() {
     final instance = FirebaseFirestore.instance;
-    final batcher = OperationsManager(instance);
+    final batcher = OperationsManager(instance, onError: (message, failures) => debugPrint("[$message] Failed operations: ${failures.length}"));
     final rateLimiter = RateLimitManager();
     return FirestoreDataSource(instance, rateLimiter, batcher);
   }
