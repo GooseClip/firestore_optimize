@@ -12,9 +12,7 @@ void main() {
           "user.name": "John",
           "user.age": 30,
           "user.username": JitDelete(),
-          "settings": {
-            "ip": "123.123.123.123",
-          },
+          "settings": {"ip": "123.123.123.123"},
           "status": "active",
         },
         merge: false,
@@ -23,14 +21,9 @@ void main() {
       final result = operation.finalize;
 
       expect(result, {
-        "user": {
-          "name": "John",
-          "age": 30,
-        },
-        "settings": {
-          "ip": "123.123.123.123",
-        },
-        "status": "active"
+        "user": {"name": "John", "age": 30},
+        "settings": {"ip": "123.123.123.123"},
+        "status": "active",
       });
     });
 
@@ -53,16 +46,12 @@ void main() {
       final result = operation.finalize;
 
       expect(result, {
-        "user": {
-          "name": "John",
-          "age": 30,
-          "username": FieldValue.delete(),
-        },
+        "user": {"name": "John", "age": 30, "username": FieldValue.delete()},
         "settings": {
           "ip": "123.123.123.123",
           "port": FieldValue.arrayUnion([8080, 8081]),
         },
-        "status": "active"
+        "status": "active",
       });
     });
   });
@@ -71,7 +60,7 @@ void main() {
     test('update', () {
       final operation = UpdateOperation(
         path: DocumentPath("doc"),
-           data: {
+        data: {
           "user.name": "John",
           "user.age": 30,
           "user.username": JitDelete(),
@@ -93,7 +82,7 @@ void main() {
           "ip": "123.123.123.123",
           "port": FieldValue.arrayUnion([8080, 8081]),
         },
-        "status": "active"
+        "status": "active",
       });
     });
   });

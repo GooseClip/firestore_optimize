@@ -7,9 +7,7 @@ abstract interface class OperationsStore {
   set operations(List<BatchOperation> ops);
 }
 
-
-abstract interface class OperationsOptimizer with JoinOperationsMixin implements OperationsStore {
-}
+abstract interface class OperationsOptimizer with JoinOperationsMixin implements OperationsStore {}
 
 mixin BatchOptimizerMixin implements OperationsOptimizer {
   int totalOptimizations = 0;

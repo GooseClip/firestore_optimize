@@ -34,18 +34,14 @@ void main() {
 
       expect(result, {
         "tags.system": ["tag1", "tag2"], // Array overwrites dotted keys
-        "tags.user.custom": "value" // Unrelated dotted key preserved
+        "tags.user.custom": "value", // Unrelated dotted key preserved
       });
     });
     test('overwrite submap value using dots', () {
       final p = {
-        "g.a.b": {
-          "c": 1,
-        }
+        "g.a.b": {"c": 1},
       };
-      final n = {
-        "g.a": 10,
-      };
+      final n = {"g.a": 10};
 
       final result = mergeMaps(p, n);
 
@@ -53,64 +49,34 @@ void main() {
     });
 
     test('overwrite dots with non-merge maps', () {
-      final p = {
-        "a.b": 1,
-        "a.c": 2,
-        "b": "stub",
-        "m.n.p": "should_remove",
-        "m.n.o.a": 3,
-        "m.n.o.b": 4,
-        "z.x.y": 9,
-      };
+      final p = {"a.b": 1, "a.c": 2, "b": "stub", "m.n.p": "should_remove", "m.n.o.a": 3, "m.n.o.b": 4, "z.x.y": 9};
       final n = {
-        "a": {
-          "b": 99,
-        },
+        "a": {"b": 99},
         "c": 123,
         "m": {
-          "n": {
-            "o": "replace",
-          }
-        }
+          "n": {"o": "replace"},
+        },
       };
 
       final result = mergeMaps(p, n);
 
       expect(result, {
-        "a": {
-          "b": 99,
-        },
+        "a": {"b": 99},
         "b": "stub",
         "c": 123,
         "m": {
-          "n": {
-            "o": "replace",
-          }
+          "n": {"o": "replace"},
         },
         "z.x.y": 9,
       });
     });
     test('overwrite dot', () {
-      final p = {
-        'a.b': 1,
-        'a.c': 2,
-        'b': 'stub',
-      };
-      final n = {
-        'a.b': 99,
-        'a.d.e': 12,
-        'c': 123,
-      };
+      final p = {'a.b': 1, 'a.c': 2, 'b': 'stub'};
+      final n = {'a.b': 99, 'a.d.e': 12, 'c': 123};
 
       final result = mergeMaps(p, n);
 
-      expect(result, {
-        'a.b': 99,
-        'a.c': 2,
-        'b': 'stub',
-        'a.d.e': 12,
-        'c': 123,
-      });
+      expect(result, {'a.b': 99, 'a.c': 2, 'b': 'stub', 'a.d.e': 12, 'c': 123});
     });
 
     group('basic merging', () {
@@ -120,12 +86,7 @@ void main() {
 
         final result = mergeMaps(p, n);
 
-        expect(result, {
-          'a': 1,
-          'b': 2,
-          'c': 3,
-          'd': 4,
-        });
+        expect(result, {'a': 1, 'b': 2, 'c': 3, 'd': 4});
       });
 
       test('should handle empty original map', () {
@@ -161,42 +122,23 @@ void main() {
 
         final result = mergeMaps(p, n);
 
-        expect(result, {
-          'a': 10,
-          'b': 2,
-          'c': 3,
-        });
+        expect(result, {'a': 10, 'b': 2, 'c': 3});
       });
     });
 
     group('nested map handling', () {
       test('should merge nested maps', () {
         final p = {
-          'user': {
-            'name': 'John',
-            'age': 30,
-          },
-          'settings': {
-            'theme': 'light',
-          },
+          'user': {'name': 'John', 'age': 30},
+          'settings': {'theme': 'light'},
         };
-        final n = DotMap({
-          'user.email': 'john@example.com',
-          'settings.notifications': true,
-        });
+        final n = DotMap({'user.email': 'john@example.com', 'settings.notifications': true});
 
         final result = mergeMaps(p, n);
 
         expect(result, {
-          'user': {
-            'name': 'John',
-            'age': 30,
-            'email': 'john@example.com',
-          },
-          'settings': {
-            'theme': 'light',
-            'notifications': true,
-          },
+          'user': {'name': 'John', 'age': 30, 'email': 'john@example.com'},
+          'settings': {'theme': 'light', 'notifications': true},
         });
       });
 
@@ -204,26 +146,18 @@ void main() {
         final p = {
           'level1': {
             'level2': {
-              'level3': {
-                'value': 'original',
-              },
+              'level3': {'value': 'original'},
             },
           },
         };
-        final n = DotMap({
-          'level1.level2.level3.newValue': 'added',
-          'level1.level2.newKey': 'another',
-        });
+        final n = DotMap({'level1.level2.level3.newValue': 'added', 'level1.level2.newKey': 'another'});
 
         final result = mergeMaps(p, n);
 
         expect(result, {
           'level1': {
             'level2': {
-              'level3': {
-                'value': 'original',
-                'newValue': 'added',
-              },
+              'level3': {'value': 'original', 'newValue': 'added'},
               'newKey': 'another',
             },
           },
@@ -232,58 +166,38 @@ void main() {
 
       test('should override entire map when incoming overwrites path', () {
         final p = {
-          'user': {
-            'name': 'John',
-            'age': 30,
-          },
+          'user': {'name': 'John', 'age': 30},
         };
         final n = DotMap({
-          'user': {
-            'email': 'john@example.com',
-          },
+          'user': {'email': 'john@example.com'},
         });
 
         final result = mergeMaps(p, n);
 
         expect(result, {
-          'user': {
-            'email': 'john@example.com',
-          },
+          'user': {'email': 'john@example.com'},
         });
       });
 
       test('should override entire map when incoming overwrites with non-map', () {
         final p = {
-          'user': {
-            'name': 'John',
-            'age': 30,
-          },
+          'user': {'name': 'John', 'age': 30},
         };
-        final n = DotMap({
-          'user': 'someid',
-        });
+        final n = DotMap({'user': 'someid'});
 
         final result = mergeMaps(p, n);
 
-        expect(result, {
-          'user': "someid",
-        });
+        expect(result, {'user': "someid"});
       });
 
       test('should not include original values when incoming overwrites with deeper path', () {
-        final p = {
-          'config': 'simple_value',
-        };
-        final n = DotMap({
-          'config.nested': 'new_value',
-        });
+        final p = {'config': 'simple_value'};
+        final n = DotMap({'config.nested': 'new_value'});
 
         final result = mergeMaps(p, n);
 
         expect(result, {
-          'config': {
-            'nested': 'new_value',
-          },
+          'config': {'nested': 'new_value'},
         });
       });
     });
@@ -294,9 +208,7 @@ void main() {
           'tags': ['flutter', 'dart'],
           'scores': [85, 90, 95],
         };
-        final n = DotMap({
-          'name': 'John',
-        });
+        final n = DotMap({'name': 'John'});
 
         final result = mergeMaps(p, n);
 
@@ -338,9 +250,7 @@ void main() {
       });
 
       test('should handle empty array with JitArrayUnion', () {
-        final p = {
-          'tags': <String>[],
-        };
+        final p = {'tags': <String>[]};
         final n = DotMap({
           'tags': JitFieldValue.arrayUnion(['flutter', 'dart']),
         });
@@ -353,9 +263,7 @@ void main() {
       });
 
       test('should replace with JitArrayUnion', () {
-        final p = {
-          'tags': 'tag1, tag2',
-        };
+        final p = {'tags': 'tag1, tag2'};
         final n = DotMap({
           'tags': JitFieldValue.arrayUnion(['flutter', 'dart']),
         });
@@ -368,9 +276,7 @@ void main() {
       });
 
       test('should add JitArrayUnion if key not present', () {
-        final p = {
-          'another': 'stub',
-        };
+        final p = {'another': 'stub'};
         final n = DotMap({
           'tags': JitFieldValue.arrayUnion(['flutter', 'dart']),
         });
@@ -384,9 +290,7 @@ void main() {
       });
 
       test('should add JitArrayRemove if key not present', () {
-        final p = {
-          'another': 'stub',
-        };
+        final p = {'another': 'stub'};
         final n = DotMap({
           'tags': JitFieldValue.arrayRemove(['flutter', 'dart']),
         });
@@ -493,29 +397,20 @@ void main() {
         final p = {
           'config': ['item1', 'item2'],
         };
-        final n = DotMap({
-          'config.nested': 'value',
-        });
+        final n = DotMap({'config.nested': 'value'});
 
         final result = mergeMaps(p, n);
 
         expect(result, {
-          'config': {
-            'nested': 'value',
-          },
+          'config': {'nested': 'value'},
         });
       });
     });
 
     group('JitDelete operations', () {
       test('should persist JitDelete ', () {
-        final p = {
-          'a': JitFieldValue.delete(),
-          'b': 2,
-        };
-        final n = DotMap({
-          'a': JitFieldValue.delete(),
-        });
+        final p = {'a': JitFieldValue.delete(), 'b': 2};
+        final n = DotMap({'a': JitFieldValue.delete()});
 
         final result = mergeMaps(p, n);
 
@@ -524,13 +419,8 @@ void main() {
       });
 
       test('should overwrite JitDelete ', () {
-        final p = {
-          'a': JitFieldValue.delete(),
-          'b': 2,
-        };
-        final n = DotMap({
-          'a': 'stub',
-        });
+        final p = {'a': JitFieldValue.delete(), 'b': 2};
+        final n = DotMap({'a': 'stub'});
 
         final result = mergeMaps(p, n);
 
@@ -539,13 +429,8 @@ void main() {
       });
 
       test('should handle JitDelete on simple values', () {
-        final p = {
-          'a': 1,
-          'b': 2,
-        };
-        final n = DotMap({
-          'a': JitFieldValue.delete(),
-        });
+        final p = {'a': 1, 'b': 2};
+        final n = DotMap({'a': JitFieldValue.delete()});
 
         final result = mergeMaps(p, n);
 
@@ -558,9 +443,7 @@ void main() {
           'tags': ['flutter', 'dart'],
           'scores': [85, 90],
         };
-        final n = DotMap({
-          'tags': JitFieldValue.delete(),
-        });
+        final n = DotMap({'tags': JitFieldValue.delete()});
 
         final result = mergeMaps(p, n);
 
@@ -570,14 +453,9 @@ void main() {
 
       test('should handle JitDelete on nested values', () {
         final p = {
-          'user': {
-            'name': 'John',
-            'email': 'john@example.com',
-          },
+          'user': {'name': 'John', 'email': 'john@example.com'},
         };
-        final n = DotMap({
-          'user.email': JitFieldValue.delete(),
-        });
+        final n = DotMap({'user.email': JitFieldValue.delete()});
 
         final result = mergeMaps(p, n);
 
@@ -588,13 +466,8 @@ void main() {
 
     group('JitIncrement operations', () {
       test('should handle JitIncrement on simple values', () {
-        final p = {
-          'score': 100,
-          'level': 5,
-        };
-        final n = DotMap({
-          'score': JitFieldValue.increment(25),
-        });
+        final p = {'score': 100, 'level': 5};
+        final n = DotMap({'score': JitFieldValue.increment(25)});
 
         final result = mergeMaps(p, n);
 
@@ -603,12 +476,8 @@ void main() {
       });
 
       test('should combine JitIncrement operations', () {
-        final p = {
-          'score': JitFieldValue.increment(10),
-        };
-        final n = DotMap({
-          'score': JitFieldValue.increment(25),
-        });
+        final p = {'score': JitFieldValue.increment(10)};
+        final n = DotMap({'score': JitFieldValue.increment(25)});
 
         final result = mergeMaps(p, n);
 
@@ -618,12 +487,8 @@ void main() {
       });
 
       test('should handle JitIncrement with negative values', () {
-        final p = {
-          'score': JitFieldValue.increment(20),
-        };
-        final n = DotMap({
-          'score': JitFieldValue.increment(-5),
-        });
+        final p = {'score': JitFieldValue.increment(20)};
+        final n = DotMap({'score': JitFieldValue.increment(-5)});
 
         final result = mergeMaps(p, n);
 
@@ -633,12 +498,8 @@ void main() {
       });
 
       test('should handle JitIncrement with double values', () {
-        final p = {
-          'score': JitFieldValue.increment(10.5),
-        };
-        final n = DotMap({
-          'score': JitFieldValue.increment(4.3),
-        });
+        final p = {'score': JitFieldValue.increment(10.5)};
+        final n = DotMap({'score': JitFieldValue.increment(4.3)});
 
         final result = mergeMaps(p, n);
 
@@ -681,21 +542,12 @@ void main() {
       test('should handle complete override scenarios', () {
         final p = {
           'config': {
-            'database': {
-              'host': 'localhost',
-              'port': 5432,
-              'ssl': true,
-            },
-            'cache': {
-              'enabled': true,
-              'ttl': 3600,
-            },
+            'database': {'host': 'localhost', 'port': 5432, 'ssl': true},
+            'cache': {'enabled': true, 'ttl': 3600},
           },
         };
         final n = DotMap({
-          'config.database': {
-            'url': 'postgresql://new-host:5433/db',
-          },
+          'config.database': {'url': 'postgresql://new-host:5433/db'},
           'config.cache.size': 1000,
         });
 
@@ -703,14 +555,8 @@ void main() {
 
         expect(result, {
           'config': {
-            'database': {
-              'url': 'postgresql://new-host:5433/db',
-            },
-            'cache': {
-              'enabled': true,
-              'ttl': 3600,
-              'size': 1000,
-            },
+            'database': {'url': 'postgresql://new-host:5433/db'},
+            'cache': {'enabled': true, 'ttl': 3600, 'size': 1000},
           },
         });
       });
@@ -718,25 +564,18 @@ void main() {
       test('should handle deep path overwrites', () {
         final p = {
           'a': {
-            'b': {
-              'c': 'original',
-              'd': 'preserved',
-            },
+            'b': {'c': 'original', 'd': 'preserved'},
             'e': 'also_preserved',
           },
         };
-        final n = DotMap({
-          'a.b.c.nested': 'new_structure',
-        });
+        final n = DotMap({'a.b.c.nested': 'new_structure'});
 
         final result = mergeMaps(p, n);
 
         expect(result, {
           'a': {
             'b': {
-              'c': {
-                'nested': 'new_structure',
-              },
+              'c': {'nested': 'new_structure'},
               'd': 'preserved',
             },
             'e': 'also_preserved',
@@ -755,10 +594,7 @@ void main() {
               'tags': ['draft'],
             },
           },
-          'timestamps': {
-            'created': '2023-01-01',
-            'updated': '2023-01-15',
-          },
+          'timestamps': {'created': '2023-01-01', 'updated': '2023-01-15'},
           'collaborators': ['user1', 'user2'],
         };
         final n = DotMap({
@@ -788,64 +624,41 @@ void main() {
         final p = {'a': 1};
         final n = DotMap({'.invalid': 'value'});
 
-        expect(
-          () => mergeMaps(p, n),
-          throwsA(isA<ArgumentError>()),
-        );
+        expect(() => mergeMaps(p, n), throwsA(isA<ArgumentError>()));
       });
 
       test('should throw ArgumentError for keys ending with dot', () {
         final p = {'a': 1};
         final n = DotMap({'invalid.': 'value'});
 
-        expect(
-          () => mergeMaps(p, n),
-          throwsA(isA<ArgumentError>()),
-        );
+        expect(() => mergeMaps(p, n), throwsA(isA<ArgumentError>()));
       });
 
       test('should throw ArgumentError for empty keys', () {
         final p = {'a': 1};
         final n = DotMap({'': 'value'});
 
-        expect(
-          () => mergeMaps(p, n),
-          throwsA(isA<ArgumentError>()),
-        );
+        expect(() => mergeMaps(p, n), throwsA(isA<ArgumentError>()));
       });
 
       test('should handle null values correctly', () {
         final p = {
           'a': null,
-          'b': {
-            'c': null,
-          },
+          'b': {'c': null},
         };
-        final n = DotMap({
-          'a': 'not_null',
-          'b.d': null,
-        });
+        final n = DotMap({'a': 'not_null', 'b.d': null});
 
         final result = mergeMaps(p, n);
 
         expect(result, {
           'a': 'not_null',
-          'b': {
-            'c': null,
-            'd': null,
-          },
+          'b': {'c': null, 'd': null},
         });
       });
 
       test('should handle special characters in keys', () {
-        final p = {
-          'key-with-dash': 'value1',
-          'key_with_underscore': 'value2',
-        };
-        final n = DotMap({
-          'key@special': 'value3',
-          'nested.key-with-dash': 'nested_value',
-        });
+        final p = {'key-with-dash': 'value1', 'key_with_underscore': 'value2'};
+        final n = DotMap({'key@special': 'value3', 'nested.key-with-dash': 'nested_value'});
 
         final result = mergeMaps(p, n);
 
@@ -880,16 +693,12 @@ void main() {
           'level1': {
             'level2': {
               'level3': {
-                'level4': {
-                  'level5': 'deep_value',
-                },
+                'level4': {'level5': 'deep_value'},
               },
             },
           },
         };
-        final n = DotMap({
-          'level1.level2.level3.level4.level5.level6': 'deeper_value',
-        });
+        final n = DotMap({'level1.level2.level3.level4.level5.level6': 'deeper_value'});
 
         final result = mergeMaps(p, n);
 
@@ -898,9 +707,7 @@ void main() {
             'level2': {
               'level3': {
                 'level4': {
-                  'level5': {
-                    'level6': 'deeper_value',
-                  },
+                  'level5': {'level6': 'deeper_value'},
                 },
               },
             },
@@ -963,10 +770,7 @@ void main() {
           'a.b.c': 99,
           'm1': {
             'x': 'keep',
-            'm2': {
-              'a': '1',
-              'b': '2',
-            },
+            'm2': {'a': '1', 'b': '2'},
           },
         };
         final n = {
@@ -988,10 +792,7 @@ void main() {
         final p = {
           'a.b.c': 99,
           'm1': {
-            'm2': {
-              'a': '1',
-              'b': '2',
-            },
+            'm2': {'a': '1', 'b': '2'},
           },
         };
         final n = {
@@ -1007,11 +808,7 @@ void main() {
         expect(result, {
           'a.b.c': 99,
           'm1': {
-            'm2': {
-              'a': '1',
-              'b': '2',
-              'c': '3',
-            },
+            'm2': {'a': '1', 'b': '2', 'c': '3'},
           },
           'f.a': {'g': 4},
           'z.x': 1,
@@ -1021,37 +818,25 @@ void main() {
       });
 
       test('overwrite previous dots', () {
-        final p = {
-          'a.b.c': 99,
-        };
-        final n = {
-          'a': '3',
-        };
+        final p = {'a.b.c': 99};
+        final n = {'a': '3'};
 
         final result = mergeMaps(p, n);
 
-        expect(result, {
-          'a': '3',
-        });
+        expect(result, {'a': '3'});
       });
 
       test('overwrite leave untouched dots in same format', () {
         final p = {
-          'x.y': {
-            'z': 3,
-          }
+          'x.y': {'z': 3},
         };
-        final n = {
-          'a': '3',
-        };
+        final n = {'a': '3'};
 
         final result = mergeMaps(p, n);
 
         expect(result, {
           'a': '3',
-          'x.y': {
-            'z': 3,
-          }
+          'x.y': {'z': 3},
         });
       });
 
@@ -1086,9 +871,7 @@ void main() {
         final result = mergeMaps(p, n);
 
         expect(result, {
-          'a.b': {
-            'd': 2,
-          },
+          'a.b': {'d': 2},
         });
       });
 
@@ -1103,10 +886,7 @@ void main() {
         final result = mergeMaps(p, n);
 
         expect(result, {
-          'a.b': {
-            'c': 1,
-            'd': 2,
-          },
+          'a.b': {'c': 1, 'd': 2},
         });
       });
 
@@ -1138,7 +918,7 @@ void main() {
           's.t': {'u': 30}, // Added
           'v': {
             'x': 35, // Added
-          }
+          },
         };
 
         final result = mergeMaps(p, n);
@@ -1153,16 +933,14 @@ void main() {
             'z': 15, // Replaced
           },
           'g.h': 5,
-          'i.j': {
-            'k': 6,
-          },
+          'i.j': {'k': 6},
           'l.m.n': 7,
           'o': 20, // Replaced,
           'q.r': 25, // Remain dot,
           's.t': {'u': 30}, // Added
           'v': {
             'x': 35, // Added
-          }
+          },
         });
       });
     });

@@ -1,4 +1,3 @@
-
 extension type DotKey(String key) implements String {
   factory DotKey.nonDot(String k) {
     if (k.contains(".")) {
@@ -235,15 +234,19 @@ void setNestedValue(Map<String, dynamic> targetMap, DotKey dotKey, dynamic value
 }
 
 ArgumentError _pathConflict(String dotPath, String pathSegment, dynamic existingValue) {
-  return ArgumentError('Path conflict detected: Cannot create nested path "$dotPath" because '
-      '"$pathSegment" already exists as a non-Map value (${existingValue.runtimeType}). '
-      'Conflicting value: $existingValue');
+  return ArgumentError(
+    'Path conflict detected: Cannot create nested path "$dotPath" because '
+    '"$pathSegment" already exists as a non-Map value (${existingValue.runtimeType}). '
+    'Conflicting value: $existingValue',
+  );
 }
 
 ArgumentError _finalKeyConflict(String dotPath, String finalKey, dynamic existingValue, dynamic attemptedValue) {
-  return ArgumentError('Path conflict detected: Cannot set Map value for "$dotPath" because '
-      '"$finalKey" already exists as a non-Map value (${existingValue.runtimeType}). '
-      'Existing value: $existingValue, Attempted value: $attemptedValue');
+  return ArgumentError(
+    'Path conflict detected: Cannot set Map value for "$dotPath" because '
+    '"$finalKey" already exists as a non-Map value (${existingValue.runtimeType}). '
+    'Existing value: $existingValue, Attempted value: $attemptedValue',
+  );
 }
 
 bool isDot(Map<String, dynamic> data) {

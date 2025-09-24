@@ -1,8 +1,5 @@
 import 'package:firestore_optimize/firestore_optimize.dart';
 
-import 'jit_field_value.dart';
-import 'dot_util.dart';
-
 extension type FirestorePathRoot(String s) implements CollectionPath {
   CollectionPath collection(String path) => CollectionPath("$this/$path");
 
@@ -83,7 +80,6 @@ class DeleteOperation extends BatchOperation {
   }
 }
 
-
 abstract class OperationFailure {
   OperationFailure(this.error, this.stackTrace);
   final Object error;
@@ -94,7 +90,6 @@ abstract class OperationFailure {
     return 'OperationFailure{error: $error}';
   }
 }
-
 
 class BatchFailure extends OperationFailure {
   BatchFailure(this.operation, super.error, super.stackTrace);

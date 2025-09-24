@@ -20,11 +20,11 @@ sealed class JitFieldValue {
 // a: { b: { c: value } }
 Map<String, dynamic> replaceAllJitFieldValues(Map<String, dynamic> m, {bool dropDeletes = false}) {
   Map<String, dynamic> result = {};
-  
+
   for (var entry in m.entries) {
     String key = entry.key;
     dynamic value = entry.value;
-    
+
     // If the value is a JitFieldValue, replace it
     if (value is JitFieldValue) {
       // If it's a JitDelete and dropDeletes is true, skip this key entirely
@@ -46,13 +46,13 @@ Map<String, dynamic> replaceAllJitFieldValues(Map<String, dynamic> m, {bool drop
       result[key] = value;
     }
   }
-  
+
   return result;
 }
 
 List<dynamic> _replaceJitFieldValuesInList(List<dynamic> list, {bool dropDeletes = false}) {
   List<dynamic> result = [];
-  
+
   for (var item in list) {
     if (item is JitFieldValue) {
       // If it's a JitDelete and dropDeletes is true, skip this item entirely
@@ -68,7 +68,7 @@ List<dynamic> _replaceJitFieldValuesInList(List<dynamic> list, {bool dropDeletes
       result.add(item);
     }
   }
-  
+
   return result;
 }
 
@@ -80,7 +80,7 @@ sealed class JitArray extends JitFieldValue {
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
     if (other is! JitArray) return false;
-    
+
     if (elements.length != other.elements.length) return false;
     for (var i = 0; i < elements.length; i++) {
       if (elements[i] != other.elements[i]) return false;

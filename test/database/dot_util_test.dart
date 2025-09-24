@@ -35,11 +35,7 @@ void main() {
       });
 
       test('should handle simple flat map', () {
-        final data = {
-          'name': 'John',
-          'age': 30,
-          'active': true,
-        };
+        final data = {'name': 'John', 'age': 30, 'active': true};
 
         final result = toDotNotation(data);
 
@@ -52,13 +48,8 @@ void main() {
       test('should handle nested maps', () {
         final data = {
           'user': {
-            'profile': {
-              'name': 'Jane',
-              'age': 25,
-            },
-            'settings': {
-              'theme': 'dark',
-            },
+            'profile': {'name': 'Jane', 'age': 25},
+            'settings': {'theme': 'dark'},
           },
           'status': 'active',
         };
@@ -85,14 +76,18 @@ void main() {
 
         expect(result.length, 3);
         expect(
-            result.any(
-                (dot) => dot.fieldPath == 'tags' && dot.value.toString() == ['flutter', 'dart', 'mobile'].toString()),
-            true);
+          result.any(
+            (dot) => dot.fieldPath == 'tags' && dot.value.toString() == ['flutter', 'dart', 'mobile'].toString(),
+          ),
+          true,
+        );
         expect(result.any((dot) => dot.fieldPath == 'scores' && dot.value.toString() == [95, 87, 92].toString()), true);
         expect(
-            result.any(
-                (dot) => dot.fieldPath == 'user.hobbies' && dot.value.toString() == ['reading', 'coding'].toString()),
-            true);
+          result.any(
+            (dot) => dot.fieldPath == 'user.hobbies' && dot.value.toString() == ['reading', 'coding'].toString(),
+          ),
+          true,
+        );
       });
 
       test('should handle mixed data types', () {
@@ -118,8 +113,9 @@ void main() {
         expect(result.any((dot) => dot.fieldPath == 'list' && dot.value.toString() == [1, 2, 3].toString()), true);
         expect(result.any((dot) => dot.fieldPath == 'nested.double' && dot.value == 3.14), true);
         expect(
-            result.any((dot) => dot.fieldPath == 'nested.innerList' && dot.value.toString() == ['a', 'b'].toString()),
-            true);
+          result.any((dot) => dot.fieldPath == 'nested.innerList' && dot.value.toString() == ['a', 'b'].toString()),
+          true,
+        );
       });
 
       test('should handle deeply nested structures', () {
@@ -127,9 +123,7 @@ void main() {
           'level1': {
             'level2': {
               'level3': {
-                'level4': {
-                  'value': 'deep',
-                },
+                'level4': {'value': 'deep'},
               },
             },
           },
@@ -144,10 +138,7 @@ void main() {
 
       test('should handle empty nested maps', () {
         final data = {
-          'user': {
-            'name': 'John',
-            'profile': {},
-          },
+          'user': {'name': 'John', 'profile': {}},
           'settings': {},
         };
 
@@ -164,10 +155,7 @@ void main() {
 
       test('should handle maps with numeric keys as strings', () {
         final data = {
-          'items': {
-            '0': 'first',
-            '1': 'second',
-          },
+          'items': {'0': 'first', '1': 'second'},
           'count': 2,
         };
 
@@ -186,21 +174,12 @@ void main() {
             'profile': {
               'firstName': 'John',
               'lastName': 'Doe',
-              'contact': {
-                'email': 'john@example.com',
-                'phone': '+1234567890',
-              },
+              'contact': {'email': 'john@example.com', 'phone': '+1234567890'},
             },
-            'preferences': {
-              'notifications': true,
-              'theme': 'dark',
-            },
+            'preferences': {'notifications': true, 'theme': 'dark'},
             'tags': ['premium', 'verified'],
           },
-          'metadata': {
-            'createdAt': '2023-01-01',
-            'version': 1,
-          },
+          'metadata': {'createdAt': '2023-01-01', 'version': 1},
           'active': true,
         };
 
@@ -210,15 +189,19 @@ void main() {
         expect(result.any((dot) => dot.fieldPath == 'user.id' && dot.value == 'user123'), true);
         expect(result.any((dot) => dot.fieldPath == 'user.profile.firstName' && dot.value == 'John'), true);
         expect(result.any((dot) => dot.fieldPath == 'user.profile.lastName' && dot.value == 'Doe'), true);
-        expect(result.any((dot) => dot.fieldPath == 'user.profile.contact.email' && dot.value == 'john@example.com'),
-            true);
+        expect(
+          result.any((dot) => dot.fieldPath == 'user.profile.contact.email' && dot.value == 'john@example.com'),
+          true,
+        );
         expect(result.any((dot) => dot.fieldPath == 'user.profile.contact.phone' && dot.value == '+1234567890'), true);
         expect(result.any((dot) => dot.fieldPath == 'user.preferences.notifications' && dot.value == true), true);
         expect(result.any((dot) => dot.fieldPath == 'user.preferences.theme' && dot.value == 'dark'), true);
         expect(
-            result.any(
-                (dot) => dot.fieldPath == 'user.tags' && dot.value.toString() == ['premium', 'verified'].toString()),
-            true);
+          result.any(
+            (dot) => dot.fieldPath == 'user.tags' && dot.value.toString() == ['premium', 'verified'].toString(),
+          ),
+          true,
+        );
         expect(result.any((dot) => dot.fieldPath == 'metadata.createdAt' && dot.value == '2023-01-01'), true);
         expect(result.any((dot) => dot.fieldPath == 'metadata.version' && dot.value == 1), true);
         expect(result.any((dot) => dot.fieldPath == 'active' && dot.value == true), true);
@@ -229,9 +212,7 @@ void main() {
           'settings.preferences.username': 'Johnny',
           'user': {
             'id': 'user123',
-            'profile': {
-              'firstName': 'John',
-            },
+            'profile': {'firstName': 'John'},
           },
         };
 
@@ -240,12 +221,14 @@ void main() {
 
         expect(result.length, 3);
         expect(
-            result.any(
-                (dot) => dot.fieldPath == 'settings.preferences.username' && dot.value == 'Johnny' && dot.wasDot),
-            true);
+          result.any((dot) => dot.fieldPath == 'settings.preferences.username' && dot.value == 'Johnny' && dot.wasDot),
+          true,
+        );
         expect(result.any((dot) => dot.fieldPath == 'user.id' && dot.value == 'user123' && !dot.wasDot), true);
-        expect(result.any((dot) => dot.fieldPath == 'user.profile.firstName' && dot.value == 'John' && !dot.wasDot),
-            true);
+        expect(
+          result.any((dot) => dot.fieldPath == 'user.profile.firstName' && dot.value == 'John' && !dot.wasDot),
+          true,
+        );
       });
 
       test('should handle dot notation with array remove', () {
@@ -287,13 +270,9 @@ void main() {
           'temporaryField': FieldValue.delete(),
           'user': {
             'oldEmail': FieldValue.delete(),
-            'profile': {
-              'deprecated': FieldValue.delete(),
-            },
+            'profile': {'deprecated': FieldValue.delete()},
           },
-          'settings': {
-            'cache': FieldValue.delete(),
-          },
+          'settings': {'cache': FieldValue.delete()},
         };
 
         final result = toDotNotation(data);
@@ -318,10 +297,7 @@ void main() {
           'user': {
             'permissions': FieldValue.arrayUnion(['write']),
             'oldPermissions': FieldValue.delete(),
-            'profile': {
-              'name': 'John',
-              'tempData': FieldValue.delete(),
-            },
+            'profile': {'name': 'John', 'tempData': FieldValue.delete()},
           },
           'normalField': 'normalValue',
         };
@@ -352,36 +328,20 @@ void main() {
       });
 
       test('should handle simple flat keys without dots', () {
-        final data = {
-          'name': 'John',
-          'age': 30,
-          'active': true,
-        };
+        final data = {'name': 'John', 'age': 30, 'active': true};
 
         final result = fromDotMap(DotMap(data));
 
-        expect(result, {
-          'name': 'John',
-          'age': 30,
-          'active': true,
-        });
+        expect(result, {'name': 'John', 'age': 30, 'active': true});
       });
 
       test('should convert simple dot notation to nested structure', () {
-        final data = {
-          'user.name': 'John',
-          'user.age': 30,
-          'user.active': true,
-        };
+        final data = {'user.name': 'John', 'user.age': 30, 'user.active': true};
 
         final result = fromDotMap(DotMap(data));
 
         expect(result, {
-          'user': {
-            'name': 'John',
-            'age': 30,
-            'active': true,
-          },
+          'user': {'name': 'John', 'age': 30, 'active': true},
         });
       });
 
@@ -400,19 +360,10 @@ void main() {
         expect(result, {
           'user': {
             'profile': {
-              'personal': {
-                'name': 'Jane',
-                'age': 25,
-              },
-              'contact': {
-                'email': 'jane@example.com',
-                'phone': '+1234567890',
-              },
+              'personal': {'name': 'Jane', 'age': 25},
+              'contact': {'email': 'jane@example.com', 'phone': '+1234567890'},
             },
-            'settings': {
-              'theme': 'dark',
-              'notifications': true,
-            },
+            'settings': {'theme': 'dark', 'notifications': true},
           },
         });
       });
@@ -431,14 +382,10 @@ void main() {
         expect(result, {
           'user': {
             'name': 'John',
-            'profile': {
-              'age': 30,
-            },
+            'profile': {'age': 30},
           },
           'status': 'active',
-          'metadata': {
-            'version': 1,
-          },
+          'metadata': {'version': 1},
           'simple': 'value',
         });
       });
@@ -482,14 +429,8 @@ void main() {
 
         expect(result, {
           'items': {
-            '0': {
-              'name': 'first',
-              'value': 100,
-            },
-            '1': {
-              'name': 'second',
-              'value': 200,
-            },
+            '0': {'name': 'first', 'value': 100},
+            '1': {'name': 'second', 'value': 200},
           },
           'count': 2,
         });
@@ -534,31 +475,19 @@ void main() {
             'profile': {
               'firstName': 'John',
               'lastName': 'Doe',
-              'contact': {
-                'email': 'john@example.com',
-                'phone': '+1234567890',
-              },
+              'contact': {'email': 'john@example.com', 'phone': '+1234567890'},
             },
-            'preferences': {
-              'notifications': true,
-              'theme': 'dark',
-            },
+            'preferences': {'notifications': true, 'theme': 'dark'},
             'tags': ['premium', 'verified'],
           },
-          'metadata': {
-            'createdAt': '2023-01-01',
-            'version': 1,
-          },
+          'metadata': {'createdAt': '2023-01-01', 'version': 1},
           'active': true,
         });
       });
 
       test('should be inverse of toDotNotation for simple cases', () {
         final original = {
-          'user': {
-            'name': 'John',
-            'age': 30,
-          },
+          'user': {'name': 'John', 'age': 30},
           'status': 'active',
         };
 
@@ -574,25 +503,17 @@ void main() {
       });
 
       test('should handle single level deep paths', () {
-        final data = {
-          'user.name': 'John',
-          'user.age': 30,
-        };
+        final data = {'user.name': 'John', 'user.age': 30};
 
         final result = fromDotMap(DotMap(data));
 
         expect(result, {
-          'user': {
-            'name': 'John',
-            'age': 30,
-          },
+          'user': {'name': 'John', 'age': 30},
         });
       });
 
       test('should handle very deep nesting', () {
-        final data = {
-          'level1.level2.level3.level4.level5.value': 'deep',
-        };
+        final data = {'level1.level2.level3.level4.level5.value': 'deep'};
 
         final result = fromDotMap(DotMap(data));
 
@@ -601,9 +522,7 @@ void main() {
             'level2': {
               'level3': {
                 'level4': {
-                  'level5': {
-                    'value': 'deep',
-                  },
+                  'level5': {'value': 'deep'},
                 },
               },
             },
@@ -622,32 +541,19 @@ void main() {
 
         expect(result, {
           'user': {
-            'profile': {
-              'first-name': 'John',
-              'last_name': 'Doe',
-            },
-            'settings': {
-              'theme-color': 'blue',
-            },
+            'profile': {'first-name': 'John', 'last_name': 'Doe'},
+            'settings': {'theme-color': 'blue'},
           },
         });
       });
 
       group('Path Conflicts and Edge Cases', () {
         test('should throw when conflicting paths with simple value vs nested structure', () {
-          final data = {
-            'user': 'SimpleString',
-            'user.name': 'John',
-            'user.age': 30,
-          };
+          final data = {'user': 'SimpleString', 'user.name': 'John', 'user.age': 30};
 
           expect(
             () => fromDotMap(DotMap(data)),
-            throwsA(isA<ArgumentError>().having(
-              (e) => e.message,
-              'message',
-              contains('Path conflict detected'),
-            )),
+            throwsA(isA<ArgumentError>().having((e) => e.message, 'message', contains('Path conflict detected'))),
           );
         });
 
@@ -663,11 +569,7 @@ void main() {
 
           expect(
             () => fromDotMap(DotMap(data)),
-            throwsA(isA<ArgumentError>().having(
-              (e) => e.message,
-              'message',
-              contains('Path conflict detected'),
-            )),
+            throwsA(isA<ArgumentError>().having((e) => e.message, 'message', contains('Path conflict detected'))),
           );
         });
 
@@ -681,11 +583,7 @@ void main() {
 
           expect(
             () => fromDotMap(DotMap(data)),
-            throwsA(isA<ArgumentError>().having(
-              (e) => e.message,
-              'message',
-              contains('Path conflict detected'),
-            )),
+            throwsA(isA<ArgumentError>().having((e) => e.message, 'message', contains('Path conflict detected'))),
           );
         });
 
@@ -701,11 +599,7 @@ void main() {
 
           expect(
             () => fromDotMap(DotMap(data)),
-            throwsA(isA<ArgumentError>().having(
-              (e) => e.message,
-              'message',
-              contains('Path conflict detected'),
-            )),
+            throwsA(isA<ArgumentError>().having((e) => e.message, 'message', contains('Path conflict detected'))),
           );
         });
 
@@ -722,44 +616,27 @@ void main() {
 
           // Should only process valid keys
           expect(result, {
-            'valid': {
-              'key': 'value',
-            },
+            'valid': {'key': 'value'},
           });
         });
 
         test('should handle empty strings as keys', () {
-          final data = {
-            '': 'empty-key',
-            'normal.key': 'value',
-            'user.': 'trailing-dot',
-          };
+          final data = {'': 'empty-key', 'normal.key': 'value', 'user.': 'trailing-dot'};
 
           final result = fromDotMap(DotMap(data));
 
           // Should only process valid keys
           expect(result, {
-            'normal': {
-              'key': 'value',
-            },
+            'normal': {'key': 'value'},
           });
         });
 
         test('should throw on single character key conflicts', () {
-          final data = {
-            'a': 'single',
-            'a.b': 'nested',
-            'x.y.z': 'deep',
-            'a.b.c.d.e.f': 'very-deep',
-          };
+          final data = {'a': 'single', 'a.b': 'nested', 'x.y.z': 'deep', 'a.b.c.d.e.f': 'very-deep'};
 
           expect(
             () => fromDotMap(DotMap(data)),
-            throwsA(isA<ArgumentError>().having(
-              (e) => e.message,
-              'message',
-              contains('Path conflict detected'),
-            )),
+            throwsA(isA<ArgumentError>().having((e) => e.message, 'message', contains('Path conflict detected'))),
           );
         });
 
@@ -775,11 +652,7 @@ void main() {
 
           expect(
             () => fromDotMap(DotMap(data)),
-            throwsA(isA<ArgumentError>().having(
-              (e) => e.message,
-              'message',
-              contains('Path conflict detected'),
-            )),
+            throwsA(isA<ArgumentError>().having((e) => e.message, 'message', contains('Path conflict detected'))),
           );
         });
 
@@ -794,21 +667,12 @@ void main() {
 
           expect(
             () => fromDotMap(DotMap(data)),
-            throwsA(isA<ArgumentError>().having(
-              (e) => e.message,
-              'message',
-              contains('Path conflict detected'),
-            )),
+            throwsA(isA<ArgumentError>().having((e) => e.message, 'message', contains('Path conflict detected'))),
           );
         });
 
         test('should preserve order when no conflicts exist', () {
-          final data = {
-            'z.last': 'last',
-            'a.first': 'first',
-            'm.middle': 'middle',
-            'b.second': 'second',
-          };
+          final data = {'z.last': 'last', 'a.first': 'first', 'm.middle': 'middle', 'b.second': 'second'};
 
           final result = fromDotMap(DotMap(data));
 
@@ -838,49 +702,38 @@ void main() {
               'key1': 'value1',
               'key2': 'value2',
               'key3': 'value3',
-              'nested': {
-                'deep': 'deep-value',
-              },
+              'nested': {'deep': 'deep-value'},
             },
           });
         });
 
         test('should throw on extremely deep conflicts', () {
-          final data = {
-            'a.b.c.d.e.f.g.h.i.j': 'deep-value',
-            'a': 'root-value',
-            'a.b.c': 'mid-value',
-          };
+          final data = {'a.b.c.d.e.f.g.h.i.j': 'deep-value', 'a': 'root-value', 'a.b.c': 'mid-value'};
 
           expect(
             () => fromDotMap(DotMap(data)),
-            throwsA(isA<ArgumentError>().having(
-              (e) => e.message,
-              'message',
-              contains('Path conflict detected'),
-            )),
+            throwsA(isA<ArgumentError>().having((e) => e.message, 'message', contains('Path conflict detected'))),
           );
         });
 
         test('should provide detailed error messages for conflicts', () {
-          final data = {
-            'user': 'John',
-            'user.profile.name': 'Jane',
-          };
+          final data = {'user': 'John', 'user.profile.name': 'Jane'};
 
           expect(
             () => fromDotMap(DotMap(data)),
-            throwsA(isA<ArgumentError>().having(
-              (e) => e.message,
-              'message',
-              allOf([
-                contains('Path conflict detected'),
-                contains('user.profile.name'),
-                contains('user'),
-                contains('String'),
-                contains('John'),
-              ]),
-            )),
+            throwsA(
+              isA<ArgumentError>().having(
+                (e) => e.message,
+                'message',
+                allOf([
+                  contains('Path conflict detected'),
+                  contains('user.profile.name'),
+                  contains('user'),
+                  contains('String'),
+                  contains('John'),
+                ]),
+              ),
+            ),
           );
         });
 
@@ -900,23 +753,15 @@ void main() {
           expect(result, {
             'user': {
               'name': 'John',
-              'profile': {
-                'email': 'john@example.com',
-              },
+              'profile': {'email': 'john@example.com'},
             },
             'settings': {
               'theme': {
-                'colors': {
-                  'primary': '#blue',
-                  'secondary': '#green',
-                },
+                'colors': {'primary': '#blue', 'secondary': '#green'},
               },
             },
             'config': {
-              'database': {
-                'host': 'localhost',
-                'port': 5432,
-              },
+              'database': {'host': 'localhost', 'port': 5432},
             },
           });
         });

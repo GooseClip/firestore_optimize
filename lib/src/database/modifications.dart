@@ -15,7 +15,6 @@ class Modification {
   }
 }
 
-/// Deeply compare two ProtoBuf objects for modified values.
 List<Modification> computeModifications(
   Map<String, dynamic> p,
   Map<String, dynamic> n, {

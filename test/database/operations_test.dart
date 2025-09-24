@@ -15,11 +15,8 @@ void main() {
           final result = operation.finalize;
 
           expect(result, {
-            "user": {
-              "name": "John",
-              "age": 30,
-            },
-            "status": "active"
+            "user": {"name": "John", "age": 30},
+            "status": "active",
           });
         });
 
@@ -27,11 +24,8 @@ void main() {
           final operation = SetOperation(
             path: DocumentPath("users/123"),
             data: {
-              "user": {
-                "name": "John",
-                "age": 30,
-              },
-              "status": "active"
+              "user": {"name": "John", "age": 30},
+              "status": "active",
             },
             merge: false,
           );
@@ -39,20 +33,13 @@ void main() {
           final result = operation.finalize;
 
           expect(result, {
-            "user": {
-              "name": "John",
-              "age": 30,
-            },
-            "status": "active"
+            "user": {"name": "John", "age": 30},
+            "status": "active",
           });
         });
 
         test('should handle empty data', () {
-          final operation = SetOperation(
-            path: DocumentPath("users/123"),
-            data: {},
-            merge: false,
-          );
+          final operation = SetOperation(path: DocumentPath("users/123"), data: {}, merge: false);
 
           final result = operation.finalize;
 
@@ -63,10 +50,7 @@ void main() {
 
     group('UpdateOperation', () {
       test('toString should return correct format', () {
-        final operation = UpdateOperation(
-          path: DocumentPath("users/123"),
-          data: {"name": "John"},
-        );
+        final operation = UpdateOperation(path: DocumentPath("users/123"), data: {"name": "John"});
 
         expect(operation.toString(), "[UpdateOperation][users/123]");
       });
@@ -83,10 +67,7 @@ void main() {
       });
 
       test('should handle empty data', () {
-        final operation = UpdateOperation(
-          path: DocumentPath("users/123"),
-          data: {},
-        );
+        final operation = UpdateOperation(path: DocumentPath("users/123"), data: {});
 
         final result = operation.finalize;
 

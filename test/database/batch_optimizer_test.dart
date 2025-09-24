@@ -23,9 +23,7 @@ void main() {
   group('all', () {
     group('remove previous operations', () {
       test('removing a set operation', () {
-        final optimizer = MockBatchManager([
-          SetOperation(path: DocumentPath("a/b"), data: DotMap({}), merge: true),
-        ]);
+        final optimizer = MockBatchManager([SetOperation(path: DocumentPath("a/b"), data: DotMap({}), merge: true)]);
 
         final o = optimizer.$removePreviousOperations(DeleteOperation(path: DocumentPath("a/b")));
         expect(optimizer.operations, []);
@@ -33,9 +31,7 @@ void main() {
       });
 
       test('removing an update operation', () {
-        final optimizer = MockBatchManager([
-          UpdateOperation(path: DocumentPath("a/b"), data: DotMap({})),
-        ]);
+        final optimizer = MockBatchManager([UpdateOperation(path: DocumentPath("a/b"), data: DotMap({}))]);
 
         final o = optimizer.$removePreviousOperations(DeleteOperation(path: DocumentPath("a/b")));
         expect(optimizer.operations.length, 0);
@@ -43,9 +39,7 @@ void main() {
       });
 
       test('removing an delete operation', () {
-        final optimizer = MockBatchManager([
-          DeleteOperation(path: DocumentPath("a/b")),
-        ]);
+        final optimizer = MockBatchManager([DeleteOperation(path: DocumentPath("a/b"))]);
 
         final o = optimizer.$removePreviousOperations(DeleteOperation(path: DocumentPath("a/b")));
         expect(optimizer.operations.length, 0);
@@ -95,8 +89,9 @@ void main() {
           DeleteOperation(path: DocumentPath("e/f")),
         ]);
 
-        final o = optimizer
-            .$removePreviousOperations(SetOperation(path: DocumentPath("a/b"), data: DotMap({}), merge: false));
+        final o = optimizer.$removePreviousOperations(
+          SetOperation(path: DocumentPath("a/b"), data: DotMap({}), merge: false),
+        );
         expect(optimizer.operations.length, 3);
         expect(optimizer.operations[0], isA<SetOperation>());
         expect(optimizer.operations[0].path, DocumentPath("c/d"));

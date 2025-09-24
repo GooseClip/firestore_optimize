@@ -142,7 +142,7 @@ Map<String, dynamic> mergeMaps(Map<String, dynamic> p0, Map<String, dynamic> n0)
       for (var i = 0; i < parts.length; i++) {
         final p = parts.take(i + 1).join(".");
 
-        // Next is going to overwrite this dot value. 
+        // Next is going to overwrite this dot value.
         // e.g. previous a.b.c.d = 5;
         //      next     a.b = [];
         if (n1.keys.contains(p)) {
@@ -213,8 +213,12 @@ Map<String, dynamic> mergeMaps(Map<String, dynamic> p0, Map<String, dynamic> n0)
           if (result[p] is! Map) {
             result[p] = <String, dynamic>{};
           }
-          setNestedValue(result[p] as Map<String, dynamic>, DotKey(k.replaceFirst("$p.", "")), kv.value,
-              overwrite: true);
+          setNestedValue(
+            result[p] as Map<String, dynamic>,
+            DotKey(k.replaceFirst("$p.", "")),
+            kv.value,
+            overwrite: true,
+          );
         }
         handled = true;
         break;

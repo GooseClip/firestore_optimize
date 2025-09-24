@@ -1,13 +1,9 @@
 import 'dart:async';
 import 'dart:collection';
-
 import 'operations.dart';
 
 class RateLimitManager {
-  RateLimitManager({
-    this.rateLimitWindow = const Duration(seconds: 60),
-    this.maxRequests = 100,
-  });
+  RateLimitManager({this.rateLimitWindow = const Duration(seconds: 60), this.maxRequests = 100});
 
   static bool enabled = true;
   final Duration rateLimitWindow;

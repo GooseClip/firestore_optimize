@@ -75,7 +75,7 @@ mixin JoinOperationsMixin implements OperationsStore {
    * 
   */
 
- // DONE
+  // DONE
   int $applySetonSet(SetOperation previous, SetOperation incoming) {
     final overwrite = previous.overwrite || incoming.overwrite;
 
@@ -90,7 +90,10 @@ mixin JoinOperationsMixin implements OperationsStore {
     }
 
     if (incoming.merge) {
-      next.data = mergeMaps(previous.data, toDotMap(incoming.data)); // Set with merge is the same Update with dot notation
+      next.data = mergeMaps(
+        previous.data,
+        toDotMap(incoming.data),
+      ); // Set with merge is the same Update with dot notation
     } else {
       next.data = mergeMaps(previous.data, incoming.data);
     }
@@ -100,7 +103,7 @@ mixin JoinOperationsMixin implements OperationsStore {
     return 1;
   }
 
- // DONE
+  // DONE
   int $applyUpdateOnSet(SetOperation previous, UpdateOperation incoming) {
     final overwrite = previous.overwrite;
 
@@ -112,7 +115,7 @@ mixin JoinOperationsMixin implements OperationsStore {
     return 1;
   }
 
-// DONE
+  // DONE
   int $applySetonUpdate(UpdateOperation previous, SetOperation incoming) {
     final overwrite = incoming.overwrite;
 
@@ -126,10 +129,11 @@ mixin JoinOperationsMixin implements OperationsStore {
       return 1;
     }
 
-    // TODO double check this if the update didn't want a merge, then we might loose the behaviour
-
     if (incoming.merge) {
-      next.data = mergeMaps(previous.data, toDotMap(incoming.data)); // Set with merge is the same Update with dot notation
+      next.data = mergeMaps(
+        previous.data,
+        toDotMap(incoming.data),
+      ); // Set with merge is the same Update with dot notation
     } else {
       next.data = mergeMaps(previous.data, incoming.data);
     }

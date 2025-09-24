@@ -8,7 +8,7 @@ void main() {
       test('should create FieldValue.arrayUnion when replace() is called', () {
         final jitArrayUnion = JitFieldValue.arrayUnion(['item1', 'item2']);
         final fieldValue = jitArrayUnion.replace();
-        
+
         expect(fieldValue, isA<FieldValue>());
         // Note: We can't directly test the internal value of FieldValue,
         // but we can verify it's the correct type
@@ -17,21 +17,26 @@ void main() {
       test('should handle empty array', () {
         final jitArrayUnion = JitFieldValue.arrayUnion([]);
         final fieldValue = jitArrayUnion.replace();
-        
+
         expect(fieldValue, isA<FieldValue>());
       });
 
       test('should handle array with mixed types', () {
-        final jitArrayUnion = JitFieldValue.arrayUnion(['string', 42, true, {'key': 'value'}]);
+        final jitArrayUnion = JitFieldValue.arrayUnion([
+          'string',
+          42,
+          true,
+          {'key': 'value'},
+        ]);
         final fieldValue = jitArrayUnion.replace();
-        
+
         expect(fieldValue, isA<FieldValue>());
       });
 
       test('should be equal when elements are the same', () {
         final union1 = JitFieldValue.arrayUnion(['a', 'b']);
         final union2 = JitFieldValue.arrayUnion(['a', 'b']);
-        
+
         expect(union1, equals(union2));
         expect(union1.hashCode, equals(union2.hashCode));
       });
@@ -39,7 +44,7 @@ void main() {
       test('should not be equal when elements are different', () {
         final union1 = JitFieldValue.arrayUnion(['a', 'b']);
         final union2 = JitFieldValue.arrayUnion(['a', 'c']);
-        
+
         expect(union1, isNot(equals(union2)));
       });
     });
@@ -48,14 +53,14 @@ void main() {
       test('should create FieldValue.arrayRemove when replace() is called', () {
         final jitArrayRemove = JitFieldValue.arrayRemove(['item1', 'item2']);
         final fieldValue = jitArrayRemove.replace();
-        
+
         expect(fieldValue, isA<FieldValue>());
       });
 
       test('should handle empty array', () {
         final jitArrayRemove = JitFieldValue.arrayRemove([]);
         final fieldValue = jitArrayRemove.replace();
-        
+
         expect(fieldValue, isA<FieldValue>());
       });
     });
@@ -64,7 +69,7 @@ void main() {
       test('should create FieldValue.delete when replace() is called', () {
         final jitDelete = JitFieldValue.delete();
         final fieldValue = jitDelete.replace();
-        
+
         expect(fieldValue, isA<FieldValue>());
       });
     });
@@ -73,21 +78,21 @@ void main() {
       test('should create FieldValue.increment when replace() is called', () {
         final jitIncrement = JitFieldValue.increment(5);
         final fieldValue = jitIncrement.replace();
-        
+
         expect(fieldValue, isA<FieldValue>());
       });
 
       test('should handle negative increment', () {
         final jitIncrement = JitFieldValue.increment(-3);
         final fieldValue = jitIncrement.replace();
-        
+
         expect(fieldValue, isA<FieldValue>());
       });
 
       test('should handle decimal increment', () {
         final jitIncrement = JitFieldValue.increment(2.5);
         final fieldValue = jitIncrement.replace();
-        
+
         expect(fieldValue, isA<FieldValue>());
       });
     });
@@ -120,10 +125,7 @@ void main() {
     });
 
     test('should replace JitServerTimestamp instances in flat map', () {
-      final input = {
-        'name': 'John',
-        'timestamp': JitFieldValue.serverTimestamp(),
-      };
+      final input = {'name': 'John', 'timestamp': JitFieldValue.serverTimestamp()};
 
       final result = replaceAllJitFieldValues(input);
 
@@ -139,7 +141,7 @@ void main() {
           'profile': {
             'tags': JitFieldValue.arrayUnion(['tag1']),
             'age': 25,
-          }
+          },
         },
         'status': 'active',
       };
@@ -160,15 +162,12 @@ void main() {
         'operations': [
           JitFieldValue.increment(1),
           'string_value',
-          {
-            'nested': JitFieldValue.delete(),
-            'value': 42,
-          },
+          {'nested': JitFieldValue.delete(), 'value': 42},
           [
             JitFieldValue.arrayUnion(['nested_array']),
             'another_string',
-          ]
-        ]
+          ],
+        ],
       };
 
       final result = replaceAllJitFieldValues(input);
@@ -187,7 +186,7 @@ void main() {
     test('should handle empty map', () {
       final input = <String, dynamic>{};
       final result = replaceAllJitFieldValues(input);
-      
+
       expect(result, isEmpty);
     });
 
@@ -200,7 +199,7 @@ void main() {
         'metadata': {
           'created': 'today',
           'tags': ['tag1', 'tag2'],
-        }
+        },
       };
 
       final result = replaceAllJitFieldValues(input);
@@ -217,10 +216,10 @@ void main() {
                 'increment': JitFieldValue.increment(10),
                 'delete': JitFieldValue.delete(),
                 'regular': 'value',
-              }
-            }
-          }
-        }
+              },
+            },
+          },
+        },
       };
 
       final result = replaceAllJitFieldValues(input);
@@ -234,30 +233,21 @@ void main() {
     test('should handle complex mixed scenario', () {
       final input = {
         'user_id': 'user123',
-        'counters': {
-          'views': JitFieldValue.increment(1),
-          'likes': JitFieldValue.increment(2),
-        },
+        'counters': {'views': JitFieldValue.increment(1), 'likes': JitFieldValue.increment(2)},
         'tags': JitFieldValue.arrayUnion(['new_tag', 'another_tag']),
         'removed_tags': JitFieldValue.arrayRemove(['old_tag']),
         'metadata': {
           'created_at': 'timestamp',
           'updated_fields': [
             'field1',
-            {
-              'field_name': 'complex_field',
-              'operation': JitFieldValue.delete(),
-            }
+            {'field_name': 'complex_field', 'operation': JitFieldValue.delete()},
           ],
           'cache': JitFieldValue.delete(),
         },
         'settings': {
           'notifications': true,
-          'preferences': {
-            'theme': 'dark',
-            'language': 'en',
-          }
-        }
+          'preferences': {'theme': 'dark', 'language': 'en'},
+        },
       };
 
       final result = replaceAllJitFieldValues(input);
@@ -308,10 +298,7 @@ void main() {
     });
 
     test('should keep JitDelete values when dropDeletes is false (default)', () {
-      final input = {
-        'name': 'John',
-        'removed': JitFieldValue.delete(),
-      };
+      final input = {'name': 'John', 'removed': JitFieldValue.delete()};
 
       final result = replaceAllJitFieldValues(input, dropDeletes: false);
 
@@ -330,7 +317,7 @@ void main() {
             'tags': JitFieldValue.arrayUnion(['tag1']),
             'age': 25,
             'removeThis': JitFieldValue.delete(),
-          }
+          },
         },
         'status': 'active',
         'deleteThis': JitFieldValue.delete(),
@@ -356,16 +343,13 @@ void main() {
           JitFieldValue.increment(1),
           'string_value',
           JitFieldValue.delete(),
-          {
-            'nested': JitFieldValue.delete(),
-            'value': 42,
-          },
+          {'nested': JitFieldValue.delete(), 'value': 42},
           [
             JitFieldValue.arrayUnion(['nested_array']),
             JitFieldValue.delete(),
             'another_string',
-          ]
-        ]
+          ],
+        ],
       };
 
       final result = replaceAllJitFieldValues(input, dropDeletes: true);
@@ -388,10 +372,7 @@ void main() {
       final input = {
         'delete1': JitFieldValue.delete(),
         'delete2': JitFieldValue.delete(),
-        'nested': {
-          'delete3': JitFieldValue.delete(),
-          'delete4': JitFieldValue.delete(),
-        }
+        'nested': {'delete3': JitFieldValue.delete(), 'delete4': JitFieldValue.delete()},
       };
 
       final result = replaceAllJitFieldValues(input, dropDeletes: true);
@@ -404,15 +385,8 @@ void main() {
 
     test('should handle arrays with only JitDelete values when dropDeletes is true', () {
       final input = {
-        'operations': [
-          JitFieldValue.delete(),
-          JitFieldValue.delete(),
-        ],
-        'mixed': [
-          'keep_this',
-          JitFieldValue.delete(),
-          'keep_this_too',
-        ]
+        'operations': [JitFieldValue.delete(), JitFieldValue.delete()],
+        'mixed': ['keep_this', JitFieldValue.delete(), 'keep_this_too'],
       };
 
       final result = replaceAllJitFieldValues(input, dropDeletes: true);
@@ -448,14 +422,11 @@ void main() {
                 'increment': JitFieldValue.increment(10),
                 'delete': JitFieldValue.delete(),
                 'regular': 'value',
-                'level5': {
-                  'deepDelete': JitFieldValue.delete(),
-                  'keepThis': 'value',
-                }
-              }
-            }
-          }
-        }
+                'level5': {'deepDelete': JitFieldValue.delete(), 'keepThis': 'value'},
+              },
+            },
+          },
+        },
       };
 
       final result = replaceAllJitFieldValues(input, dropDeletes: true);
@@ -484,7 +455,7 @@ void main() {
       expect(result['a.b.d'], isA<FieldValue>());
       expect(result['x.y.z'], equals('regular_value'));
       expect(result['simple_key'], isA<FieldValue>());
-      
+
       // Ensure the structure is flat, not nested
       expect(result.containsKey('a'), isFalse);
       expect(result.length, equals(4));
@@ -506,20 +477,17 @@ void main() {
       expect(result['user.profile.age'], isA<FieldValue>());
       expect(result['user.settings.notifications'], isTrue);
       expect(result['metadata.updated'], equals('timestamp'));
-      
+
       // These should be dropped
       expect(result.containsKey('user.settings.theme'), isFalse);
       expect(result.containsKey('metadata.created'), isFalse);
-      
+
       expect(result.length, equals(4));
     });
 
     test('should handle mixed dot notation and regular keys', () {
       final input = {
-        'user': {
-          'name': 'John',
-          'settings.theme': JitFieldValue.delete(),
-        },
+        'user': {'name': 'John', 'settings.theme': JitFieldValue.delete()},
         'profile.data.age': JitFieldValue.increment(1),
         'tags': JitFieldValue.arrayUnion(['tag1']),
         'cache.invalidate': JitFieldValue.delete(),
@@ -538,26 +506,20 @@ void main() {
     test('should handle dot notation keys in arrays', () {
       final input = {
         'operations': [
-          {
-            'field.path.name': JitFieldValue.delete(),
-            'field.path.value': 42,
-          },
-          {
-            'another.field': JitFieldValue.increment(1),
-            'regular_field': 'value',
-          }
-        ]
+          {'field.path.name': JitFieldValue.delete(), 'field.path.value': 42},
+          {'another.field': JitFieldValue.increment(1), 'regular_field': 'value'},
+        ],
       };
 
       final result = replaceAllJitFieldValues(input, dropDeletes: true);
 
       final operations = result['operations'] as List;
       expect(operations.length, equals(2));
-      
+
       final firstOp = operations[0] as Map;
       expect(firstOp.containsKey('field.path.name'), isFalse);
       expect(firstOp['field.path.value'], equals(42));
-      
+
       final secondOp = operations[1] as Map;
       expect(secondOp['another.field'], isA<FieldValue>());
       expect(secondOp['regular_field'], equals('value'));
@@ -572,14 +534,10 @@ void main() {
         'user.profile.settings.language': JitFieldValue.delete(),
         'user.permissions.read': true,
         'user.permissions.write': JitFieldValue.delete(),
-        
+
         // Mixed with regular nested structure
-        'metadata': {
-          'created.at': 'timestamp',
-          'cache.data': JitFieldValue.delete(),
-          'version': 1,
-        },
-        
+        'metadata': {'created.at': 'timestamp', 'cache.data': JitFieldValue.delete(), 'version': 1},
+
         // Array with dot notation
         'updates': [
           'user.last.login',
@@ -587,8 +545,8 @@ void main() {
           {
             'field.name': 'test.field',
             'operation': JitFieldValue.arrayUnion(['value']),
-          }
-        ]
+          },
+        ],
       };
 
       final result = replaceAllJitFieldValues(input, dropDeletes: true);
@@ -598,17 +556,17 @@ void main() {
       expect(result['user.profile.personal.age'], isA<FieldValue>());
       expect(result['user.profile.settings.theme'], equals('dark'));
       expect(result['user.permissions.read'], isTrue);
-      
+
       // Deleted keys should be gone
       expect(result.containsKey('user.profile.settings.language'), isFalse);
       expect(result.containsKey('user.permissions.write'), isFalse);
-      
+
       // Check nested structure
       expect(result['metadata'], isA<Map<String, dynamic>>());
       expect(result['metadata']['created.at'], equals('timestamp'));
       expect(result['metadata']['version'], equals(1));
       expect((result['metadata'] as Map).containsKey('cache.data'), isFalse);
-      
+
       // Check array
       final updates = result['updates'] as List;
       expect(updates.length, equals(2)); // One JitDelete removed
@@ -635,7 +593,7 @@ void main() {
       expect(result['a.'], isA<FieldValue>());
       expect(result['.b'], equals('value'));
       expect(result['normal_key'], equals('normal_value'));
-      
+
       // These should be dropped
       expect(result.containsKey(''), isFalse);
       expect(result.containsKey('..'), isFalse);
@@ -649,15 +607,9 @@ void main() {
         'user.profile': {
           'name': 'John',
           'age': JitFieldValue.increment(1),
-          'settings': {
-            'theme': 'dark',
-            'notifications': JitFieldValue.delete(),
-          }
+          'settings': {'theme': 'dark', 'notifications': JitFieldValue.delete()},
         },
-        'metadata.cache': {
-          'lastUpdated': 'timestamp',
-          'invalidate': JitFieldValue.delete(),
-        },
+        'metadata.cache': {'lastUpdated': 'timestamp', 'invalidate': JitFieldValue.delete()},
         'simple_key': 'simple_value',
       };
 
@@ -686,23 +638,20 @@ void main() {
         'user.profile.name': 'John',
         'user.profile.age': JitFieldValue.increment(1),
         'user.settings.theme': JitFieldValue.delete(),
-        
+
         // Partial dot notation (dot notation key with nested object)
         'user.permissions': {
           'read': true,
           'write': JitFieldValue.delete(),
-          'admin': {
-            'users': false,
-            'system': JitFieldValue.delete(),
-          }
+          'admin': {'users': false, 'system': JitFieldValue.delete()},
         },
-        
+
         // Regular nested structure
         'metadata': {
           'created': 'timestamp',
           'cache.enabled': JitFieldValue.delete(), // dot notation within regular nesting
           'version': 1,
-        }
+        },
       };
 
       final result = replaceAllJitFieldValues(input, dropDeletes: true);
@@ -739,19 +688,15 @@ void main() {
               'ssl': true,
               'timeout': JitFieldValue.increment(30),
               'deprecated_setting': JitFieldValue.delete(),
-            }
+            },
           },
           'pool_size': JitFieldValue.increment(10),
         },
         'app.features.enabled': {
           'auth': true,
           'analytics': JitFieldValue.delete(),
-          'cache': {
-            'redis': true,
-            'memory': false,
-            'cleanup_job': JitFieldValue.delete(),
-          }
-        }
+          'cache': {'redis': true, 'memory': false, 'cleanup_job': JitFieldValue.delete()},
+        },
       };
 
       final result = replaceAllJitFieldValues(input, dropDeletes: true);
@@ -761,11 +706,11 @@ void main() {
       expect(dbConfig['host'], equals('localhost'));
       expect(dbConfig['port'], equals(5432));
       expect(dbConfig['pool_size'], isA<FieldValue>());
-      
+
       final credentials = dbConfig['credentials'] as Map<String, dynamic>;
       expect(credentials['username'], equals('user'));
       expect(credentials.containsKey('password'), isFalse);
-      
+
       final options = credentials['options'] as Map<String, dynamic>;
       expect(options['ssl'], isTrue);
       expect(options['timeout'], isA<FieldValue>());
@@ -775,7 +720,7 @@ void main() {
       final features = result['app.features.enabled'] as Map<String, dynamic>;
       expect(features['auth'], isTrue);
       expect(features.containsKey('analytics'), isFalse);
-      
+
       final cache = features['cache'] as Map<String, dynamic>;
       expect(cache['redis'], isTrue);
       expect(cache['memory'], isFalse);
@@ -787,29 +732,17 @@ void main() {
         'user.preferences': {
           'themes': ['dark', 'light'],
           'notifications': [
-            {
-              'type': 'email',
-              'enabled': true,
-              'frequency': JitFieldValue.delete(),
-            },
-            {
-              'type': 'push',
-              'enabled': JitFieldValue.delete(),
-              'sound': true,
-            },
+            {'type': 'email', 'enabled': true, 'frequency': JitFieldValue.delete()},
+            {'type': 'push', 'enabled': JitFieldValue.delete(), 'sound': true},
             JitFieldValue.delete(),
           ],
           'languages': JitFieldValue.arrayUnion(['es', 'fr']),
         },
         'app.modules': [
-          {
-            'name': 'auth',
-            'config.timeout': JitFieldValue.increment(30),
-            'deprecated': JitFieldValue.delete(),
-          },
+          {'name': 'auth', 'config.timeout': JitFieldValue.increment(30), 'deprecated': JitFieldValue.delete()},
           'billing',
           JitFieldValue.delete(),
-        ]
+        ],
       };
 
       final result = replaceAllJitFieldValues(input, dropDeletes: true);
@@ -818,7 +751,7 @@ void main() {
       final preferences = result['user.preferences'] as Map<String, dynamic>;
       expect(preferences['themes'], equals(['dark', 'light']));
       expect(preferences['languages'], isA<FieldValue>());
-      
+
       final notifications = preferences['notifications'] as List;
       expect(notifications.length, equals(2)); // One JitDelete removed
       expect((notifications[0] as Map)['type'], equals('email'));
@@ -841,32 +774,22 @@ void main() {
       final input = {
         // Empty object with dot notation key
         'empty.path': {},
-        
+
         // Dot notation key with object containing only JitDelete values
-        'delete.only': {
-          'field1': JitFieldValue.delete(),
-          'field2': JitFieldValue.delete(),
-        },
-        
+        'delete.only': {'field1': JitFieldValue.delete(), 'field2': JitFieldValue.delete()},
+
         // Nested dot notation keys
         'outer.path': {
-          'inner.path': {
-            'value': 42,
-            'delete_me': JitFieldValue.delete(),
-          },
+          'inner.path': {'value': 42, 'delete_me': JitFieldValue.delete()},
           'another.inner': JitFieldValue.increment(1),
         },
-        
+
         // Complex mixed scenario
         'config.app.settings': {
           'theme.dark': true,
-          'cache': {
-            'enabled': true,
-            'ttl.seconds': JitFieldValue.increment(300),
-            'cleanup': JitFieldValue.delete(),
-          },
+          'cache': {'enabled': true, 'ttl.seconds': JitFieldValue.increment(300), 'cleanup': JitFieldValue.delete()},
           'features.experimental': JitFieldValue.delete(),
-        }
+        },
       };
 
       final result = replaceAllJitFieldValues(input, dropDeletes: true);
@@ -899,7 +822,7 @@ void main() {
     test('should maintain consistency between full and partial dot notation', () {
       // This test ensures that using full dot notation vs partial dot notation
       // produces equivalent results for the same logical structure
-      
+
       final fullDotNotation = {
         'user.profile.name': 'John',
         'user.profile.age': JitFieldValue.increment(1),
@@ -911,11 +834,8 @@ void main() {
         'user.profile': {
           'name': 'John',
           'age': JitFieldValue.increment(1),
-          'settings': {
-            'theme': 'dark',
-            'notifications': JitFieldValue.delete(),
-          }
-        }
+          'settings': {'theme': 'dark', 'notifications': JitFieldValue.delete()},
+        },
       };
 
       final result1 = replaceAllJitFieldValues(fullDotNotation, dropDeletes: true);
