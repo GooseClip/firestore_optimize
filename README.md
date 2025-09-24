@@ -20,6 +20,16 @@ This is the main way you can save costs. [update -> update -> update] will be me
 - **Dot Map Expansion**: Convert dot notation back to nested structures
 - **Conflict Detection**: Intelligent handling of path conflicts
 
+
+## Performance Benefits
+
+- **Reduced Write Operations**: Operation merging can reduce writes by 50-80%
+- **Reduced Listen Operations**: By reducing writes, we reduce any streamed listen propagation
+- **Lower Costs**: Fewer operations mean lower Firestore billing
+- **Better Performance**: Batched operations are faster than individual writes
+- **Rate Limit Protection**: Automatic throttling prevents quota exhaustion and runaway costs
+- **Conflict Resolution**: Smart handling of conflicting operations
+
 > See test cases
 
 ## Installation
@@ -390,14 +400,6 @@ await dataSource.set(  // ❌ set does NOT support dot notation
   merge: true,
 );
 ```
-
-## Performance Benefits
-
-- **Reduced Write Operations**: Operation merging can reduce writes by 50-80%
-- **Lower Costs**: Fewer operations mean lower Firestore billing
-- **Better Performance**: Batched operations are faster than individual writes
-- **Rate Limit Protection**: Automatic throttling prevents quota exhaustion
-- **Conflict Resolution**: Smart handling of conflicting operations
 
 ## Testing
 
