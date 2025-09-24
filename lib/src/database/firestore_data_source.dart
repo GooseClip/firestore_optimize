@@ -31,6 +31,7 @@ String documentIdFromCurrentDate() {
 }
 
 typedef QueryBuilder = Query<Map<String, dynamic>> Function(Query<Map<String, dynamic>> query);
+typedef DocumentBuilder<T> = T? Function(Map<String, dynamic>? data, String documentID);
 
 class FirestoreDataSource {
   FirestoreDataSource(this.instance, this.rateLimiter, this.batcher);
@@ -56,7 +57,7 @@ class FirestoreDataSource {
     }
 
     if (rateLimit) {
-      await rateLimiter.checkRateLimit(path, "insert", batched: false);
+      await rateLimiter.checkRateLimit(path, "add", batched: false);
     }
     return instance.collection(path).add(data);
   }
@@ -165,7 +166,7 @@ class FirestoreDataSource {
   // watch collections and documents as streams
   Stream<List<T>> watchCollection<T>({
     required CollectionPath path,
-    required T? Function(Map<String, dynamic>? data, String documentID) builder,
+    required DocumentBuilder<T> builder,
     QueryBuilder? queryBuilder,
     int Function(T lhs, T rhs)? sort,
     ListenSource source = ListenSource.defaultSource,
@@ -196,7 +197,7 @@ class FirestoreDataSource {
 
   Stream<CollectionChanges<T>> watchCollectionChanges<T>({
     required CollectionPath path,
-    required T? Function(Map<String, dynamic>? data, String documentID) builder,
+    required DocumentBuilder<T> builder,
     QueryBuilder? queryBuilder,
     int Function(T lhs, T rhs)? sort,
     ListenSource source = ListenSource.defaultSource,
@@ -240,7 +241,7 @@ class FirestoreDataSource {
 
   Stream<T?> watchDocument<T>({
     required DocumentPath path,
-    required T? Function(Map<String, dynamic>? data, String documentID) builder,
+    required DocumentBuilder<T> builder,
     ListenSource source = ListenSource.defaultSource,
   }) {
     final reference = instance.doc(path);
@@ -257,7 +258,7 @@ class FirestoreDataSource {
   // fetch collections and documents as futures
   Future<List<T>> fetchCollection<T>({
     required CollectionPath path,
-    required T? Function(Map<String, dynamic>? data, String documentID) builder,
+    required DocumentBuilder<T> builder,
     QueryBuilder? queryBuilder,
     int Function(T lhs, T rhs)? sort,
     Source source = Source.serverAndCache,
@@ -287,7 +288,7 @@ class FirestoreDataSource {
 
   Future<T?> fetchDocument<T>({
     required DocumentPath path,
-    required T? Function(Map<String, dynamic>? data, String documentID) builder,
+    required DocumentBuilder<T> builder,
     Source source = Source.serverAndCache,
   }) async {
     final reference = instance.doc(path);
