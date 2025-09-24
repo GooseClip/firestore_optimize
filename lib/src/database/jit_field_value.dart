@@ -10,6 +10,8 @@ sealed class JitFieldValue {
   static JitDelete delete() => JitDelete();
 
   static JitIncrement increment(num value) => JitIncrement(value);
+
+  static JitServerTimestamp serverTimestamp() => JitServerTimestamp();
 }
 
 // Maps may be in the format:
@@ -115,4 +117,9 @@ class JitIncrement extends JitFieldValue {
 
   @override
   FieldValue replace() => FieldValue.increment(value);
+}
+
+class JitServerTimestamp extends JitFieldValue {
+  @override
+  FieldValue replace() => FieldValue.serverTimestamp();
 }

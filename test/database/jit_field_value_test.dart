@@ -91,6 +91,15 @@ void main() {
         expect(fieldValue, isA<FieldValue>());
       });
     });
+
+    group('JitServerTimestamp', () {
+      test('should create FieldValue.serverTimestamp when replace() is called', () {
+        final jitServerTimestamp = JitFieldValue.serverTimestamp();
+        final fieldValue = jitServerTimestamp.replace();
+
+        expect(fieldValue, isA<FieldValue>());
+      });
+    });
   });
 
   group('replaceAllJitFieldValues', () {
@@ -108,6 +117,18 @@ void main() {
       expect(result['count'], isA<FieldValue>());
       expect(result['tags'], isA<FieldValue>());
       expect(result['removed'], isA<FieldValue>());
+    });
+
+    test('should replace JitServerTimestamp instances in flat map', () {
+      final input = {
+        'name': 'John',
+        'timestamp': JitFieldValue.serverTimestamp(),
+      };
+
+      final result = replaceAllJitFieldValues(input);
+
+      expect(result['name'], equals('John'));
+      expect(result['timestamp'], isA<FieldValue>());
     });
 
     test('should handle nested maps', () {
@@ -918,4 +939,4 @@ void main() {
       expect(result2.length, equals(1));
     });
   });
-} 
+}
