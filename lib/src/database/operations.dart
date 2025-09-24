@@ -1,3 +1,5 @@
+import 'package:firestore_optimize/firestore_optimize.dart';
+
 import 'jit_field_value.dart';
 import 'dot_util.dart';
 
@@ -78,5 +80,38 @@ class DeleteOperation extends BatchOperation {
   @override
   String toString() {
     return "[DeleteOperation][$path]";
+  }
+}
+
+
+abstract class OperationFailure {
+  OperationFailure(this.error, this.stackTrace);
+  final Object error;
+  final StackTrace stackTrace;
+
+  @override
+  String toString() {
+    return 'OperationFailure{error: $error}';
+  }
+}
+
+
+class BatchFailure extends OperationFailure {
+  BatchFailure(this.operation, super.error, super.stackTrace);
+  final BatchOperation operation;
+
+  @override
+  String toString() {
+    return 'BatchFailure{operation: $operation, error: $error}';
+  }
+}
+
+class MergeFailure extends OperationFailure {
+  MergeFailure(this.operations, super.error, super.stackTrace);
+  final Iterable<BatchOperation> operations;
+
+  @override
+  String toString() {
+    return 'MergeFailure{operations: $operations, error: $error}';
   }
 }

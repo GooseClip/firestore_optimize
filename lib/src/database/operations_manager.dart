@@ -9,9 +9,10 @@ import 'operations.dart';
 import 'optimizer/join_operations_mixin.dart';
 
 class OperationsManager with BatchOptimizerMixin, JoinOperationsMixin {
-  OperationsManager(this.instance);
+  OperationsManager(this.instance, {this.onError});
 
   final FirebaseFirestore instance;
+  final void Function(String message, List<OperationFailure> failures)? onError;
   final Lock _lock = Lock();
   Timer? _batchTimer;
   int totalOperations = 0;
@@ -26,47 +27,29 @@ class OperationsManager with BatchOptimizerMixin, JoinOperationsMixin {
     await _lock.synchronized(() {});
   }
 
-  Future<void> set({
-    required DocumentPath path,
-    required Map<String, dynamic> data,
-    required bool merge,
-  }) async {
+  Future<void> set({required DocumentPath path, required Map<String, dynamic> data, required bool merge}) async {
     final op = SetOperation(path: path, data: data, merge: merge);
     await instance.doc(path).set(op.finalize, SetOptions(merge: merge));
   }
 
-  Future<int> batchSet({
-    required DocumentPath path,
-    required Map<String, dynamic> data,
-    required bool merge,
-  }) async {
+  Future<int> batchSet({required DocumentPath path, required Map<String, dynamic> data, required bool merge}) async {
     return await $pushBatchOperation(SetOperation(path: path, data: data, merge: merge));
   }
 
-  Future<void> update({
-    required DocumentPath path,
-    required Map<String, dynamic> data,
-  }) async {
+  Future<void> update({required DocumentPath path, required Map<String, dynamic> data}) async {
     final op = UpdateOperation(path: path, data: data);
     await instance.doc(path).update(op.finalize);
   }
 
-  Future<int> batchUpdate({
-    required DocumentPath path,
-    required Map<String, dynamic> data,
-  }) async {
+  Future<int> batchUpdate({required DocumentPath path, required Map<String, dynamic> data}) async {
     return await $pushBatchOperation(UpdateOperation(path: path, data: data));
   }
 
-  Future<void> delete({
-    required DocumentPath path,
-  }) async {
+  Future<void> delete({required DocumentPath path}) async {
     await instance.doc(path).delete();
   }
 
-  Future<int> batchDelete({
-    required DocumentPath path,
-  }) async {
+  Future<int> batchDelete({required DocumentPath path}) async {
     return await $pushBatchOperation(DeleteOperation(path: path));
   }
 
@@ -92,6 +75,10 @@ class OperationsManager with BatchOptimizerMixin, JoinOperationsMixin {
       return ops;
     });
 
+    if (batchOperations.isEmpty) {
+      return;
+    }
+
     final batch = instance.batch();
     // Try commit all operations in a single batch
     try {
@@ -111,10 +98,11 @@ class OperationsManager with BatchOptimizerMixin, JoinOperationsMixin {
       await batch.commit();
       return;
     } catch (e) {
-      debugPrint("Error committing batch: $e");
+      debugPrint("Error committing batch, failing over to individual commits: $e");
     }
 
     // Failing over to individual commits
+    final List<OperationFailure> failures = [];
 
     // Map operations by type
     final setOperations = batchOperations.whereType<SetOperation>();
@@ -124,29 +112,30 @@ class OperationsManager with BatchOptimizerMixin, JoinOperationsMixin {
     for (var op in setOperations) {
       try {
         await instance.doc(op.path).set(op.data!, SetOptions(merge: op.merge));
-      } catch (e) {
-          debugPrint("Set operation failed during failover: $e");
+      } catch (e, s) {
+        failures.add(BatchFailure(op, e, s));
       }
     }
 
     for (var op in updateOperations) {
       try {
         await instance.doc(op.path).update(op.data!);
-      } catch (e) {
-        debugPrint("Update operation failed during failover: $e");
+      } catch (e, s) {
+        failures.add(BatchFailure(op, e, s));
       }
     }
 
     for (var op in deleteOperations) {
       try {
         await instance.doc(op.path).delete();
-      } catch (e) {
-        debugPrint("Delete operation failed during failover: $e");
+      } catch (e, s) {
+        failures.add(BatchFailure(op, e, s));
       }
     }
 
-    //--------------------------------- BATCH DONE [FAIL OVER] ---------------------------------
-    // debugPrint("Applied operations: ${batchOperations.map((e) => e.path.split("/").last).join(", ")}");
+    if (failures.isNotEmpty) {
+      onError?.call("Some operations failed during failover commit", failures);
+    }
   }
 
   Future<bool> hasPendingOperations(DocumentPath path) async {
@@ -178,8 +167,8 @@ class OperationsManager with BatchOptimizerMixin, JoinOperationsMixin {
     final m = Merge(path, data);
     try {
       return m.apply(hits);
-    } catch (e) {
-      debugPrint("Merge] Failed with error: $e");
+    } catch (e, s) {
+      onError?.call("Merge] Failed with error: $path", [MergeFailure(hits, e, s)]);
       return data;
     }
   }
