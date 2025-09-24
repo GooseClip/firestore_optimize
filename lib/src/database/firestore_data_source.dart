@@ -46,7 +46,6 @@ class FirestoreDataSource {
   Future<DocumentReference> insert({
     required CollectionPath path,
     required Map<String, dynamic> data,
-    bool merge = false,
     bool rateLimit = true,
   }) async {
     if (data.values.any((e) => e is FieldValue)) {
@@ -79,16 +78,13 @@ class FirestoreDataSource {
     final hasPending = batch && await batcher.hasPendingOperations(path);
     final canRateLimit = rateLimit && !hasPending && RateLimitManager.enabled;
     if (canRateLimit) {
-      // Checking rate limit for set data: $path
       await batcher.busy();
       await rateLimiter.checkRateLimit(path, "set", batched: batch);
     }
 
     if (batch) {
-      // Batching set data: $path
       final optimized = await batcher.batchSet(path: path, data: data, merge: merge);
 
-      // Released rate limit for set data: $path
       // Release all matching paths currently waiting since we already have a pending batch
       if (canRateLimit) rateLimiter.release(path, optimized);
       return;
@@ -218,7 +214,6 @@ class FirestoreDataSource {
             break;
           case DocumentChangeType.modified:
             if (batcher.willMergeDelete(path.document(change.doc.id))) {
-              //("Merge yielding delete");
               removed.add(builder(change.doc.data(), change.doc.id));
               break;
             }
@@ -248,7 +243,6 @@ class FirestoreDataSource {
     final Stream<DocumentSnapshot<Map<String, dynamic>>> snapshots = reference.snapshots(source: source);
     return snapshots.map((snapshot) {
       if (batcher.willMergeDelete(path)) {
-        //("Merge yielding delete");
         return null;
       }
       final data = batcher.mergePendingOperations(path, snapshot.data());
